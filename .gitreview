@@ -1,0 +1,7 @@
+[gerrit]
+host=gerrit.wikimedia.org
+port=29418
+project=operations/debs/prometheus-swagger-exporter.git
+defaultbranch=master
+defaultrebase=0
+track=1
