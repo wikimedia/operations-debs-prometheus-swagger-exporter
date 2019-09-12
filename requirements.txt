@@ -1,0 +1,4 @@
+gevent==1.1.2
+bottle==0.12.13
+prometheus_client==0.0.18
+git+https://gerrit.wikimedia.org/r/operations/software/service-checker@tags/upstream/0.2.0
