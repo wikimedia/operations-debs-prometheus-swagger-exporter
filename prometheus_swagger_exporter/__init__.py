@@ -49,14 +49,14 @@ def get_summary(checks):
     return gmf
 
 
-def get_metrics(target, timeout=5):
-    target = urllib3.util.parse_url(target)
-    metrics_manager = Prometheus(hostname=target.host)
+def get_metrics(url: urllib3.util.Url, spec_segment, timeout=5):
+    metrics_manager = Prometheus(hostname=url.host)
     checker = CheckService(
-        target.host,
-        target.url,
+        url.host,
+        url.url,
         timeout,
-        metrics_manager=metrics_manager
+        spec_segment,
+        metrics_manager
     )
     # Spawn the downloaders
     checks = [
@@ -72,13 +72,39 @@ def get_metrics(target, timeout=5):
     return metrics_manager.metrics
 
 
+def sanitize_path(path, spec_segment):
+    if len(path) > 0:
+        # strip trailing slash
+        if path.endswith('/'):
+            path = path[:-1]
+        # strip spec segment
+        if path[-len(spec_segment):] == spec_segment:
+            path = path[:-len(spec_segment)]
+    return path
+
+
+def get_url(target, request_path, spec_segment):
+    # parse_url doesn't do the right thing when given just a host:port as a url
+    # give it a scheme if it doesn't have one -- http only
+    if target[:4] != 'http':
+        target = 'http://{}'.format(target)
+    scheme, auth, host, port, path, query, fragment = urllib3.util.parse_url(target)
+    if path is not None:
+        path = sanitize_path(path, spec_segment)
+    else:
+        path = sanitize_path(request_path, spec_segment)
+    return urllib3.util.Url(scheme=scheme, host=host, port=port, path=path)
+
+
 @route('/probe')
 def metrics():
     timeout = int(request.headers.get(
         'X-Prometheus-Scrape-Timeout-Seconds',
         default=CheckerBase.nrpe_timeout
     ))
-    metrics = get_metrics(request.query.target, timeout)
+    spec_segment = request.params.get('spec_segment', '/?spec')
+    url = get_url(request.params.target, request.params.get('path', ''), spec_segment)
+    metrics = get_metrics(url, spec_segment, timeout)
     return generate_latest(metrics)
 
 

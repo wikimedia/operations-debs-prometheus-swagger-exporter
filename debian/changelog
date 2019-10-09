@@ -1,3 +1,12 @@
+prometheus-swagger-exporter (0.2-1) unstable; urgency=medium
+
+  * Parameterize path so as to better integrate with Prometheus service
+    discovery.  Maintain backwards compatibility.
+  * Parameterize spec_segment.  Maintain backwards compatibility.
+  * Improvements preparing the url for sending to CheckService.
+
+ -- Cole White <cwhite@wikimedia.org>  Wed, 09 Oct 2019 00:53:00 +0000
+
 prometheus-swagger-exporter (0.1-1) unstable; urgency=medium
 
   * Initial release
