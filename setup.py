@@ -4,7 +4,16 @@ import os
 here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.md')).read()
 
-version = '0.1'
+
+def get_debian_version(basedir):
+    version = '0.1'
+    with open(os.path.join(basedir, 'debian', 'changelog'), 'r') as f:
+        for line in f.readlines():
+            if line[:27] == 'prometheus-swagger-exporter':
+                version = line.split('(')[1].split(')')[0].split('-')[0]
+                break
+    return version
+
 
 install_requires = [
     'bottle>=0.12',
@@ -21,7 +30,7 @@ description = "A Prometheus exporter that renders metrics from requests"
 
 setup(
     name='prometheus-swagger-exporter',
-    version=version,
+    version=get_debian_version(here),
     description=description,
     long_description=README,
     author='Cole White',

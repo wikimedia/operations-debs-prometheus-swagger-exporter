@@ -4,6 +4,7 @@ prometheus-swagger-exporter (0.3-1) unstable; urgency=medium
     representation of a float value.  int() cannot parse it,
     but float() can.
   * Removed requirements.txt as it is no longer needed.
+  * Added version collection from Debian changelog
 
  -- Cole White <cwhite@wikimedia.org>  Fri, 10 Jan 2020 16:56:56 +0000
 
