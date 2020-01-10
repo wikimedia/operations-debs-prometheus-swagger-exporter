@@ -98,7 +98,7 @@ def get_url(target, request_path, spec_segment):
 
 @route('/probe')
 def metrics():
-    timeout = int(request.headers.get(
+    timeout = float(request.headers.get(
         'X-Prometheus-Scrape-Timeout-Seconds',
         default=CheckerBase.nrpe_timeout
     ))
