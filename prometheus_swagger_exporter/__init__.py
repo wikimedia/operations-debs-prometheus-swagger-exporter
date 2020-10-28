@@ -10,6 +10,9 @@ from prometheus_client.core import GaugeMetricFamily
 from prometheus_client.exposition import generate_latest
 import urllib3
 
+# seconds to subtract from the request timeout to allow for rendering time
+RESPONSE_HEADROOM = 3
+
 
 class MetricsCollection(list):
     def collect(self):
@@ -36,21 +39,26 @@ class Prometheus(Metrics):
         return [('path', url.path), ('host', url.host)]
 
 
-def get_summary(checks):
+def summarize(checks):
+    return get_summary(all([check['job'].successful() for check in checks]))
+
+
+def get_summary(result):
     gmf = GaugeMetricFamily(
         'service_checker_probe_success',
         'condensed view of all checks as a one (pass) or zero (fail)',
         labels=[]
     )
-    if all([check['job'].successful for check in checks]):
-        gmf.add_metric(value=1, labels=[])
-    else:
-        gmf.add_metric(value=0, labels=[])
+    gmf.add_metric(value=int(result), labels=[])
     return gmf
 
 
 def get_metrics(url: urllib3.util.Url, spec_segment, timeout=5):
     metrics_manager = Prometheus(hostname=url.host)
+    timeout -= RESPONSE_HEADROOM
+    if timeout <= 0:  # It is useless to proceed with a timeout of 0 or less
+        metrics_manager.metrics.append(get_summary(False))  # Assume failure
+        return metrics_manager.metrics
     checker = CheckService(
         url.host,
         url.url,
@@ -68,7 +76,7 @@ def get_metrics(url: urllib3.util.Url, spec_segment, timeout=5):
     ]
     gevent.joinall([v['job'] for v in checks], timeout)
     # summarize check result in to a 1 or 0 gauge
-    metrics_manager.metrics.append(get_summary(checks))
+    metrics_manager.metrics.append(summarize(checks))
     return metrics_manager.metrics
 
 
