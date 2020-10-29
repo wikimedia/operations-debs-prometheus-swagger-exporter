@@ -1,0 +1,32 @@
+prometheus-swagger-exporter (0.4-1) unstable; urgency=medium
+
+  * Bugfix: accurately evaluate result of all requests
+  * Subtract headroom from requested timeout to allow time
+    for a response to be generated
+
+ -- Cole White <cwhite@wikimedia.org>  Wed, 28 Oct 2020 17:20:45 -0600
+
+prometheus-swagger-exporter (0.3-1) unstable; urgency=medium
+
+  * Bugfix: X-Prometheus-Scrape-Timeout-Seconds is a string
+    representation of a float value.  int() cannot parse it,
+    but float() can.
+  * Removed requirements.txt as it is no longer needed.
+  * Added version collection from Debian changelog
+
+ -- Cole White <cwhite@wikimedia.org>  Fri, 10 Jan 2020 16:56:56 +0000
+
+prometheus-swagger-exporter (0.2-1) unstable; urgency=medium
+
+  * Parameterize path so as to better integrate with Prometheus service
+    discovery.  Maintain backwards compatibility.
+  * Parameterize spec_segment.  Maintain backwards compatibility.
+  * Improvements preparing the url for sending to CheckService.
+
+ -- Cole White <cwhite@wikimedia.org>  Wed, 09 Oct 2019 00:53:00 +0000
+
+prometheus-swagger-exporter (0.1-1) unstable; urgency=medium
+
+  * Initial release
+
+ -- Cole White <cwhite@wikimedia.org>  Thu, 29 Aug 2019 17:30:31 +0000
